@@ -1,3 +1,3 @@
 local access = {}
-  on = true
+  access.on = true
 return access
