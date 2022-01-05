@@ -1,5 +1,5 @@
 local access = {}
- function access.Printhi()
-  print("hi")
+ function access.get_access()
+  return true
  end
 return access
