@@ -1,0 +1,189 @@
+local whitelistecheck = loadstring(game:HttpGet("https://pastebin.com/raw/5wnAn9re", true))()
+if whitelistecheck[game:service('Players').LocalPlayer.UserId] then
+
+    local function mobsAlive()
+        for i,v in pairs(game.Workspace.Mobs:GetChildren()) do
+            if v.Name ~= "Noob" then
+    			if v:FindFirstChild("Humanoid") then
+    				if v.Humanoid.Health > 0 then
+                		return true
+    				end
+    			end
+            end
+        end
+        return false
+    end
+    local function getDungeonSword()
+        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+            if v.Config.Nickname.Value == "DungeonSword" then
+                return v
+            end
+        end
+    end
+    function RareToNum(n)
+        for i,v in pairs(game.ReplicatedStorage.Rarities:GetChildren()) do
+            if v.RarityName.Value == n then
+                return tonumber(v.Name)
+            end
+        end
+    end
+    function QualToNum(n)
+        for i,v in pairs(game.ReplicatedStorage.Qualities:GetChildren()) do
+            if v.QualityName.Value == n then
+                return tonumber(v.Name)
+            end
+        end
+    end
+    function MoldToNum(n)
+        for i,v in pairs(game.ReplicatedStorage.Molds:GetChildren()) do
+            if v.MoldName.Value == n then
+                return tonumber(v.Name)
+            end
+        end
+    end
+    function ClassToNum(n)
+        for i,v in pairs(game.ReplicatedStorage.Classes:GetChildren()) do
+            if v.ClassNames.Value == n then
+                return tonumber(v.Name)
+            end
+        end
+    end
+    if _G.BlackScreen then
+        setfpscap(5)
+        game:GetService("RunService"):Set3dRenderingEnabled(false)
+        gui2 = Instance.new("ScreenGui")
+        gui2.Parent = game.CoreGui
+        overlayFrame = Instance.new("Frame")
+        overlayFrame.Parent = gui2
+        overlayFrame.BackgroundTransparency = 0
+        overlayFrame.Position = UDim2.new(0,0,0,0)
+        overlayFrame.Size = UDim2.new(1,0,1,0)
+        overlayFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    end
+
+    function sell()
+        if _G.autoSell then
+                for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                    if v:FindFirstChild("Config") then
+                    if v.Config.Nickname ~= "DungeonSword" then
+                    if (v.Config.Mold.Value < MoldToNum(_G.sellMold)) == true then
+                    if (v.Config.Quality.Value < QualToNum(_G.sellQual)) == true then
+                    if (v.Config.Class.Value < ClassToNum(_G.sellClass)) == true then
+                    if (v.Config.Rarity.Value < RareToNum(_G.sellRare)) == true then
+                        game.Players.LocalPlayer.Character.Humanoid:EquipTool(v)
+                        v.Parent = game.Workspace
+                    end end end end
+                    if v.Config.Mold.Value == 10004 or v.Config.Mold.Value == 10009 then
+                        game.Players.LocalPlayer.Character.Humanoid:EquipTool(v)
+                        v.Parent = game.Workspace
+                    end end end
+
+                end
+                if _G.DungeonFarm then
+                    if not game.Players.LocalPlayer.Character:FindFirstChild("Sword") then
+                        game.Players.LocalPlayer.Character.Humanoid:EquipTool(getDungeonSword())
+                    end
+                end
+            end
+        end
+
+    function nearestDungeonMob()
+        local closest = nil
+        for i,v in pairs(game.Workspace.Mobs:GetChildren()) do
+            if v.Name ~= "Noob" and v:FindFirstChild("HumanoidRootPart") then
+    			if v.Humanoid.Health > 0 then
+    	            if closest == nil then
+    	                closest = v
+    	            else
+    	                hum = game.Players.LocalPlayer.Character.HumanoidRootPart
+    	                if (hum.Position - v.HumanoidRootPart.Position).magnitude < (hum.Position - closest.HumanoidRootPart.Position).magnitude then
+    	                    closest = v
+    	                end
+    	            end
+    			end
+            end
+        end
+        return closest
+    end
+
+    spawn(function()
+        while wait() do
+            if _G.DungeonFarm then
+                repeat wait() until game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+                repeat wait() until game.Players.LocalPlayer.Character.Humanoid.Health > 0
+                player = game.Players.LocalPlayer
+                if not player.Character then player.CharacterAdded:Wait() end
+                if not game.Players.LocalPlayer.Character:FindFirstChild("Sword") then
+                    wait(1)
+                    for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                        if v:FindFirstChild("Config").Nickname.Value == "DungeonSword" then
+                            game.Players.LocalPlayer.Character.Humanoid:EquipTool(v)
+                        end
+                    end
+                end
+                if not game.Workspace:FindFirstChild("MagmaDungeon") then
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Workspace.Maps["Magma Hills"].DungeonMatchmaking.MatchmakingPad.CFrame + Vector3.new(0,3,0)
+                else
+                    print("dungeon found")
+                    repeat wait() until game.Workspace.MagmaDungeon:FindFirstChild("Start")
+                    for i=0,5 do
+                        print("Checking Rooms")
+                        for i,v in pairs(game.Workspace.MagmaDungeon:GetChildren()) do
+                            if v.Name ~= "Start" and v.Name ~= "EndModule" and v:FindFirstChild("Start") then
+                                wait()
+                                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Start.CFrame
+                            end
+                        end
+                    end
+                    print("Mob check")
+                    repeat wait() until game.Workspace.Mobs:FindFirstChild("Borock")
+                        repeat
+                            print("Finding nearest mob")
+            				breakTimer = 0
+            				mob = nearestDungeonMob()
+            				pcall(function()
+                                print("Killing nearest mob")
+        	                   repeat
+        	                       breakTimer = breakTimer + 1
+        	                       wait()
+        	                       game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = mob.HumanoidRootPart.CFrame + mob.HumanoidRootPart.CFrame.lookVector * -4
+        	                       game.Players.LocalPlayer.Character["Sword"]:Activate()
+        	                   until mob.Humanoid.HP.Value <= 0 or breakTimer >= 1000
+        				     end)
+        			     until mobsAlive() == false
+                    if game.Workspace:FindFirstChild("MagmaDungeon") then
+                        if not _G.SkipBoss then
+                            repeat
+                                wait()
+                                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Workspace.MagmaDungeon.EndModule.Parts.FinalBossSpawn.CFrame
+                            until game.Workspace.Mobs:FindFirstChild("The Abomination")
+                            repeat
+                                wait()
+                                if game.Workspace.Mobs:FindFirstChild("The Abomination") then
+                                    if game.Workspace.Mobs["The Abomination"]:FindFirstChild("HumanoidRootPart") then
+                                        mob = game.Workspace.Mobs["The Abomination"].HumanoidRootPart.CFrame
+                                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = mob + mob.lookVector * -5
+                                        game.Players.LocalPlayer.Character["Sword"]:Activate()
+                                    end
+                                end
+                            until game.Workspace.Mobs["The Abomination"]:WaitForChild("Humanoid").Health <= 0 or game.Players.LocalPlayer.Character.Humanoid.Health == 0
+        					repeat
+        						wait()
+        						game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Workspace.MagmaDungeon.EndModule.Chests.MagmaChest.Effect.CFrame
+        					until game.Workspace.MagmaDungeon.EndModule.Chests.MagmaChest:FindFirstChild("Lock")
+        					for i=0,15 do
+        						wait()
+        						game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Workspace.MagmaDungeon.EndModule.Parts.Stands["1"].MeshPart.CFrame
+        					end
+                        else
+                            game.Players.LocalPlayer.Character.Humanoid.Health = 0
+                        end
+                    end
+                    wait(10)
+                end
+            end
+        end
+    end)
+else
+    print("Not whitelisted loser")
+end
